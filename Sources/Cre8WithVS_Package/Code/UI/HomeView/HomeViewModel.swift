@@ -6,21 +6,22 @@
 //
 
 import SwiftUI
-final class HomeViewModel: ObservableObject {
+@MainActor
+final class HomeViewModel: AppViewCode {
     @Published var searchText = ""
-    private(set) var allItems: [ListModel] = [
-        ListModel(title: "Button",
-                  subTitle: "A tappable button element.",
-                  category: .views,
-                  closure: AnyView(ButtonView())),
+    private(set) var allItems: [ListModel] = []
+    init() {
+        super.init(printTag: "")
+        allItems.append(ListModel(title: "Button",
+                      subTitle: "A tappable button element.",
+                      category: .views,
+                                  contentView: AnyView(ButtonView())))
         
-        ListModel(title: "VStack Example",
-                  subTitle: "Vertical layout of views.",
-                  category: .layouts,
-                  closure: AnyView(StackExampleView()))        
-        // Add more items here...
-    ].sorted { $0.title < $1.title }
-    
+//        allItems.append(ListData(title:"Button",contentView: AnyView(ButtonView())))
+//        allItems.append(ListData(title:"Blur Background",contentView: AnyView(BlurBackgroundView())))
+//        allItems.append(ListData(title:"BackgroundStyle",contentView: AnyView(BackgroundStyleView())))
+//        allItems.append(ListData(title:"TabView\nA view that switches between multiple child views using interactive user interface elements.",contentView: AnyView(TabViewSwiftUI())))
+    }
     var filteredItems: [ListModel] {
         if searchText.isEmpty {
             return allItems
@@ -35,6 +36,5 @@ final class HomeViewModel: ObservableObject {
 enum ListCategory: String, CaseIterable, Identifiable {
     case views = "Views"
     case layouts = "Layouts"
-    
     var id: String { rawValue }
 }
