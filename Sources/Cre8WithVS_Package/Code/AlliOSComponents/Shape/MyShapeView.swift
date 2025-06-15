@@ -4,10 +4,8 @@
 //
 //  Created by Vijay Sachan on 17/09/23.
 //
-
 import SwiftUI
-
-struct MyShapeView: View {
+struct MyShapeView: View{
     private func tips(){
         /**
          1. If you want to fill a single Shape instance with a style, use the fill(style:) shape modifier instead of foregroundStyle(_:) because it’s more efficient.

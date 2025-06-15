@@ -7,10 +7,10 @@
 import SwiftUI
 public struct HomeView: View {    
     @StateObject private var viewModel = HomeViewModel()
-    public init() {}
+    public init(){}
     public var body: some View {
             AppView(code: viewModel){
-                List {
+                List{
                     ForEach(ListCategory.allCases) { category in
                         Section(header: Text(category.rawValue)) {
                             ForEach(viewModel.filteredItems.filter { $0.category == category }) { item in
