@@ -16,6 +16,18 @@ final class HomeViewModel: AppViewCode {
                       subTitle: "A tappable button element.",
                       category: .views,
                                   contentView: AnyView(ButtonView())))
+        allItems.append(ListModel(title: "Blur Background",
+                      subTitle: "",
+                      category: .views,
+                                  contentView: AnyView(BlurBackgroundView())))
+        allItems.append(ListModel(title: "BackgroundStyle",
+                      subTitle: "",
+                      category: .views,
+                                  contentView: AnyView(BackgroundStyleView())))
+        allItems.append(ListModel(title: "TabView",
+                      subTitle: "A view that switches between multiple child views using interactive user interface elements.",
+                      category: .views,
+                                  contentView: AnyView(TabViewSwiftUI())))
         
 //        allItems.append(ListData(title:"Button",contentView: AnyView(ButtonView())))
 //        allItems.append(ListData(title:"Blur Background",contentView: AnyView(BlurBackgroundView())))

@@ -9,7 +9,6 @@ public struct HomeView: View {
     @StateObject private var viewModel = HomeViewModel()
     public init() {}
     public var body: some View {
-        NavigationView {
             AppView(code: viewModel){
                 List {
                     ForEach(ListCategory.allCases) { category in
@@ -37,7 +36,7 @@ public struct HomeView: View {
                 // .automatic Inherit the display mode from the previous navigation item
         }
     }
-}
+
 struct HomeView_Previews: PreviewProvider {
     static var previews: some View {
         let view=HomeView()
