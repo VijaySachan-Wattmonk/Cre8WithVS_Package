@@ -5,9 +5,9 @@
 //  Created by Vijay Sachan on 6/18/25.
 //
 import SwiftUI
-import SPiOSCommonP8
 
-struct ViewNode: View,FWLoggerDelegate{
+
+struct ViewNode123: View {
     var viewModel: ViewModelNode
     @State private var searchText: String = ""
     @State private var filteredViewModels: [ViewModelNode] = []
@@ -58,9 +58,7 @@ struct ViewNode: View,FWLoggerDelegate{
         if trimmed.isEmpty {
             filteredViewModels = viewModel.childViewModel
         } else {
-            let tag=self.tag
             Task.detached(priority: .userInitiated) {
-                Global.logThreadType(tag: tag)
                 let results = await viewModel.search(trimmed)
                 await MainActor.run {
                     filteredViewModels = results

@@ -51,20 +51,18 @@ class ViewModelNode: ObservableObject{
         }
         return nil
     }
-    
 }
 extension ViewModelNode {
     func search(_ searchText: String) -> [ViewModelNode] {
         var results: [ViewModelNode] = []
-
+        
         if let node = rootNode, node.matches(searchText: searchText) {
             results.append(self)
         }
-
+        
         for child in childViewModel {
             results.append(contentsOf: child.search(searchText))
         }
-
         return results
     }
 }
