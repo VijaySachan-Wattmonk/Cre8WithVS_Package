@@ -1,68 +1,133 @@
-//
-//  ViewModelArchitecture.swift
-//  Cre8WithVS_Package
-//
-//  Created by Vijay Sachan on 6/20/25.
-//
 import SwiftUI
+import Combine
+import SPiOSCommonP8
+
 @MainActor
-class ViewModelNode: ObservableObject{
+class ViewModelNode: ObservableObject, FWLoggerDelegate {
     @Published var rootNode: ModelNode?
-    @Published var childViewModel:[ViewModelNode] = []
+    @Published var childViewModel: [ViewModelNode] = []
+
+    // MARK: - Search State
+    @Published var searchText: String = ""
+    @Published var filteredViewModels: [ViewModelNode] = []
+    @Published var isSearching: Bool = false
+
     private var viewBuilder: ((ModelNode) -> AnyView)!
-    public init(){
-        print(String(describing: type(of: self)))
+    private var cancellables = Set<AnyCancellable>()
+    private var searchTask: Task<[ViewModelNode], Error>!
+
+    // MARK: - Init
+    public init() {
+        
+        setupSearchDebounce()
     }
-    public init(_ rootNode:ModelNode,_ viewBuilder: @escaping (ModelNode) -> AnyView){
-        //        print(String(describing: type(of: self)))
+
+    public init(_ rootNode: ModelNode, _ viewBuilder: @escaping (ModelNode) -> AnyView) {
         self.rootNode = rootNode
         self.viewBuilder = viewBuilder
+        setupSearchDebounce()
     }
-    /// Asynchronously loads the root node using a background thread
+
+    // MARK: - Async Load
     func loadDataAsync() async {
         let node = await Task.detached(priority: .userInitiated) {
-            return  await self.setUp()
+            return await self.setUp()
         }.value
         self.rootNode = node
     }
-    /// Synchronously loads the root node
+
     func loadDataSync() async {
-        let node =  await setUp()
+        let node = await setUp()
         self.rootNode = node
     }
-    /// Creates the root node using provided parent and children
-    nonisolated private func setUp()async -> ModelNode{
+
+    // MARK: - Setup
+    nonisolated private func setUp() async -> ModelNode {
         let tuple = await self.createRootModelAndChildViewModels()
-        let arrVM=tuple.1
-        for viewModel in arrVM{
-            if await viewModel.rootNode == nil{
+        let arrVM = tuple.1
+        for viewModel in arrVM {
+            if await viewModel.rootNode == nil {
                 await viewModel.loadDataSync()
             }
         }
-        await MainActor.run{childViewModel.append(contentsOf:arrVM)}
+        await MainActor.run { childViewModel.append(contentsOf: arrVM) }
         return tuple.0
     }
-    nonisolated func createRootModelAndChildViewModels() async -> (ModelNode,[ViewModelNode]){
+
+    nonisolated func createRootModelAndChildViewModels() async -> (ModelNode, [ViewModelNode]) {
         fatalError("Subclasses must override createChildViewModelNodes()")
     }
-    func buildView() -> AnyView?{
-        if let viewBuilder{
+
+    func buildView() -> AnyView? {
+        if let viewBuilder {
             return viewBuilder(rootNode!)
         }
         return nil
     }
-}
-extension ViewModelNode {
-    func search(_ searchText: String) -> [ViewModelNode] {
-        var results: [ViewModelNode] = []
+
+    // MARK: - Search (Debounced)
+    private func setupSearchDebounce() {
+        $searchText
+            .debounce(for: .milliseconds(500), scheduler: DispatchQueue.main)
+            .removeDuplicates()
+            .sink { [weak self] text in
+                self?.searchTask?.cancel()
+                Task {
+                    do {
+                        try await self?.performSearch(trimmed: text)
+                    } catch is CancellationError {
+                        self?.mLog(msg: "🔴 Search task was cancelled before completion")
+                    } catch {
+                        self?.mLog(msg: "❗️Unexpected error during search: \(error)")
+                    }
+                }
+            }
+            .store(in: &cancellables)
+    }
+
+    private func performSearch(trimmed text: String) async throws {
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        if trimmed.isEmpty {
+            filteredViewModels = self.childViewModel
+            isSearching = false
+        } else {
+            isSearching = true
+            let results = try await performSearchAsync(trimmed)
+            filteredViewModels = results
+            isSearching = false
+        }
+    }
+
+    func performSearchAsync(_ searchText: String) async throws -> [ViewModelNode] {
         
+
+        let tag = self.tag
+        let task = Task.detached(priority: .userInitiated) { [weak self] () -> [ViewModelNode] in
+            guard let self = self else { return [] }
+//            Global.logThreadType(tag: tag)
+            try? await Task.sleep(nanoseconds: 3_000_000_000)
+            return try await self.search(searchText)
+        }
+
+        searchTask = task
+        return try await task.value
+    }
+
+    func search(_ searchText: String) async throws-> [ViewModelNode] {
+        var results: [ViewModelNode] = []
+
+        try Task.checkCancellation()
+
         if let node = rootNode, node.matches(searchText: searchText) {
             results.append(self)
         }
-        
+
         for child in childViewModel {
-            results.append(contentsOf: child.search(searchText))
+            
+            let childResults = try await child.search(searchText)
+            results.append(contentsOf: childResults)
         }
+
         return results
     }
 }

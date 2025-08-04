@@ -54,16 +54,16 @@ struct ViewNode123: View {
     }
 
     private func performSearch() {
-        let trimmed = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
-        if trimmed.isEmpty {
-            filteredViewModels = viewModel.childViewModel
-        } else {
-            Task.detached(priority: .userInitiated) {
-                let results = await viewModel.search(trimmed)
-                await MainActor.run {
-                    filteredViewModels = results
-                }
-            }
-        }
+//        let trimmed = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
+//        if trimmed.isEmpty {
+//            filteredViewModels = viewModel.childViewModel
+//        } else {
+//            Task.detached(priority: .userInitiated) {
+//                let results = await viewModel.search(trimmed)
+//                await MainActor.run {
+//                    filteredViewModels = results
+//                }
+//            }
+//        }
     }
 }
