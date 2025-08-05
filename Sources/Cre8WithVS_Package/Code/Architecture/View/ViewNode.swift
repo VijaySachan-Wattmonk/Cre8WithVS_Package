@@ -9,6 +9,7 @@ import SwiftUI
 import SPiOSCommonP8
 
 struct ViewNode: View, FWLoggerDelegate {
+    @State private var isSearchBarVisible: Bool = true
     @ObservedObject var viewModel: ViewModelNode
 
     var body: some View {
@@ -33,7 +34,9 @@ struct ViewNode: View, FWLoggerDelegate {
                     .listStyle(PlainListStyle())
                 } else {
                     if let view = viewModel.buildView() {
-                        view
+                        view.onAppear(){
+                            isSearchBarVisible = false
+                        }
                     } else {
                         Text("No search results")
                     }
@@ -49,9 +52,21 @@ struct ViewNode: View, FWLoggerDelegate {
                 }
             }
             .navigationTitle(rootNode.title)
-            .searchable(text: $viewModel.searchText, prompt: "Search")
+            .if(isSearchBarVisible) { view in
+                view.searchable(text: $viewModel.searchText, prompt: "Search")
+            }
         } else {
             Text("Node has no data")
+        }
+    }
+}
+
+extension View {
+    @ViewBuilder func `if`<Content: View>(_ condition: Bool, transform: (Self) -> Content) -> some View {
+        if condition {
+            transform(self)
+        } else {
+            self
         }
     }
 }
