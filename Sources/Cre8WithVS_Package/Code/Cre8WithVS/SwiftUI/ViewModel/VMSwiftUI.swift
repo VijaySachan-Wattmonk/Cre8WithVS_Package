@@ -9,11 +9,11 @@ class VMSwiftUI: ViewModelNode{
     override nonisolated func createRootModelAndChildViewModels() async -> (ModelNode, [ViewModelNode]) {
         logCurrentThread()
         let node=ModelNode( "SwiftUI", "SwiftUI subtitle", "platforms")
-        let viewModels:[ViewModelNode] = [
+        let vmChildNodes:[ViewModelNode] = [
             await VMView(),
             await VMSwiftUI(ModelNode( "ZStack", "Layered views", "All"),{_ in AnyView(ZStackDemo())})
         ]
-        return (node,viewModels)
+        return (node,vmChildNodes)
     }
     
 }

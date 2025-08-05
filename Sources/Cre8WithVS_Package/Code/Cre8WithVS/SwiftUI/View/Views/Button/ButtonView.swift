@@ -7,6 +7,7 @@
 
 import SwiftUI
 struct ButtonView: View{
+    typealias ButtonDemoSection = (label: String, builder: (ButtonView) -> AnyView)
     static func pending(){
         /**
          1. Use each available constructor
@@ -21,124 +22,112 @@ struct ButtonView: View{
             ZStack(alignment: .topLeading){
                 Color.clear
                 VStack(alignment:.center,spacing: spacing){
-                    
-                    Group {
-                        primitiveButtonStyle(self)
-                        buttonRole(self)
-                        clipShape(self)
-                        customButtonStyle(self)
-                        buttonForegroundStyle(self)
-                        buttonBackgroundStyle(self)
-                        
+                    ForEach(demoSections, id: \.label) { section in
+                        section.builder(self)
                     }
-                    
-                }.frame(maxWidth: .infinity).padding(.all,20).background(Color.white)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.all,20)
+                .background(Color.white)
             }
         }
     }
-    
-    let primitiveButtonStyle:((ButtonView)->AnyView)={
-        (buttonview:ButtonView) in
-        // PrimitiveButtonStyle
-        let font1=buttonview.font1
-        let view=MyCustomContainer(buttonview, "PrimitiveButtonStyle"){
-            VStack(alignment:.center,spacing:buttonview.spacing){
-                Button("ButtonStyle .plain",action: {}).buttonStyle(.plain).font(font1)
-                Button("ButtonStyle .automatic",action: {}).buttonStyle(.automatic).font(font1)
-                Button("ButtonStyle .bordered",action: {}).buttonStyle(.bordered).font(font1)
-                Button("ButtonStyle .borderedProminent",action: {}).buttonStyle(.borderedProminent).font(font1).fixedSize(horizontal: false, vertical: true)// fixedSize - Making button multiline
-                Button("ButtonStyle .borderless",action: {}).buttonStyle(.borderless).font(font1)
-            }
-        }
-        return AnyView(view)
+
+    var demoSections: [ButtonDemoSection] {
+        [
+            ("Primitive Button Style", primitiveButtonStyle),
+            ("Button Role", buttonRole),
+            ("Clip Shape", clipShape),
+            ("Custom Button Style", customButtonStyle),
+            ("Foreground Style", buttonForegroundStyle),
+            ("Background Style", buttonBackgroundStyle)
+        ]
     }
-    let buttonRole:((ButtonView)->AnyView)={
-        (buttonview:ButtonView) in
-        // ButtonRole
-        let font1=buttonview.font1
-        let view=MyCustomContainer(buttonview, "ButtonRole"){
-            VStack(alignment:.center,spacing:buttonview.spacing){
-                //
-                Button("ButtonRole .cancel", role:.cancel, action: {}).font(font1)
-                Button("ButtonRole .destructive", role:.destructive, action: {}).font(font1)
-            }
-        }
-        return AnyView(view)
-    }
-    let clipShape:((ButtonView)->AnyView)={
-        (buttonview:ButtonView) in
-        // clipShape
-        let font1=buttonview.font1
-        let view=MyCustomContainer(buttonview, "clipShape"){
-            VStack(alignment:.center,spacing:buttonview.spacing){
-                Button("clipShape Capsule",action: {}).buttonStyle(.borderedProminent).font(font1).clipShape(Capsule())
-                Button("clipShape RoundedRectangle ",action: {}).buttonStyle(.borderedProminent).font(font1).clipShape(RoundedRectangle(cornerRadius: 15)).fixedSize(horizontal: false, vertical: true)
-                Button("clipShape\nCircle",action: {}).font(font1).frame(width:150,height:150).background(Color.blue).foregroundColor(Color.white)
-                    .clipShape(Circle())
+
+    private func primitiveButtonStyle(_ buttonview: ButtonView) -> AnyView {
+        let font1 = buttonview.font1
+        let view = VStack(alignment: .center, spacing: buttonview.spacing) {
+            Text("PrimitiveButtonStyle").font(font1).bold().frame(maxWidth: .infinity).background(Color.black).foregroundColor(.white)
+            VStack(alignment: .center, spacing: buttonview.spacing) {
+                Button("ButtonStyle .plain", action: {}).buttonStyle(.plain).font(font1)
+                Button("ButtonStyle .automatic", action: {}).buttonStyle(.automatic).font(font1)
+                Button("ButtonStyle .bordered", action: {}).buttonStyle(.bordered).font(font1)
+                Button("ButtonStyle .borderedProminent", action: {}).buttonStyle(.borderedProminent).font(font1).fixedSize(horizontal: false, vertical: true)
+                Button("ButtonStyle .borderless", action: {}).buttonStyle(.borderless).font(font1)
             }
         }
         return AnyView(view)
     }
-    let customButtonStyle:((ButtonView)->AnyView)={
-        (buttonview:ButtonView) in
-        // Custom ButtonStyle
-        let font1=buttonview.font1
-        let view=MyCustomContainer(buttonview, "Custom ButtonStyle"){
-            VStack(alignment:.center,spacing:buttonview.spacing){
-                
-                VStack(spacing: 5){
+    private func buttonRole(_ buttonview: ButtonView) -> AnyView {
+        let font1 = buttonview.font1
+        let view = VStack(alignment: .center, spacing: buttonview.spacing) {
+            Text("ButtonRole").font(font1).bold().frame(maxWidth: .infinity).background(Color.black).foregroundColor(.white)
+            VStack(alignment: .center, spacing: buttonview.spacing) {
+                Button("ButtonRole .cancel", role: .cancel, action: {}).font(font1)
+                Button("ButtonRole .destructive", role: .destructive, action: {}).font(font1)
+            }
+        }
+        return AnyView(view)
+    }
+    private func clipShape(_ buttonview: ButtonView) -> AnyView {
+        let font1 = buttonview.font1
+        let view = VStack(alignment: .center, spacing: buttonview.spacing) {
+            Text("clipShape").font(font1).bold().frame(maxWidth: .infinity).background(Color.black).foregroundColor(.white)
+            VStack(alignment: .center, spacing: buttonview.spacing) {
+                Button("clipShape Capsule", action: {}).buttonStyle(.borderedProminent).font(font1).clipShape(Capsule())
+                Button("clipShape RoundedRectangle", action: {}).buttonStyle(.borderedProminent).font(font1).clipShape(RoundedRectangle(cornerRadius: 15)).fixedSize(horizontal: false, vertical: true)
+                Button("clipShape\nCircle", action: {}).font(font1).frame(width: 150, height: 150).background(Color.blue).foregroundColor(Color.white).clipShape(Circle())
+            }
+        }
+        return AnyView(view)
+    }
+    private func customButtonStyle(_ buttonview: ButtonView) -> AnyView {
+        let font1 = buttonview.font1
+        let view = VStack(alignment: .center, spacing: buttonview.spacing) {
+            Text("Custom ButtonStyle").font(font1).bold().frame(maxWidth: .infinity).background(Color.black).foregroundColor(.white)
+            VStack(alignment: .center, spacing: buttonview.spacing) {
+                VStack(spacing: 5) {
                     Text("ButtonStyle custom \n Tap below button to change background image").multilineTextAlignment(.center).font(.title3).fixedSize(horizontal: false, vertical: true)
                     Button(action: {}, label: {
-                        ZStack{
-                            
-                        }.frame(width:150,height:150)
+                        ZStack {}.frame(width: 150, height: 150)
                     }).buttonStyle(ButtonStyleBGImage())
                 }
-                
-                Button("ButtonStyle custom \n Tap button to tint background color",action: {}).buttonStyle(ButtonStyleTintBGColor()).font(font1).fixedSize(horizontal: false, vertical: true)
+                Button("ButtonStyle custom \n Tap button to tint background color", action: {}).buttonStyle(ButtonStyleTintBGColor()).font(font1).fixedSize(horizontal: false, vertical: true)
             }
         }
         return AnyView(view)
     }
-    let buttonForegroundStyle:((ButtonView)->AnyView)={
-        (buttonview:ButtonView) in
-        // foregroundStyle
-        let font1=buttonview.font1
-        var arr=ListShapeStyle.getList(.foreground)
-        let view=MyCustomContainer(buttonview, "foregroundStyle"){
-            VStack(alignment:.center,spacing:buttonview.spacing){
-                ForEach((0..<arr.count),id: \.self){
-                    i in
-                    let tuple=arr[i]
-                    Button("Button\nShapeStyle : \(tuple.name)",action: {}).font(font1).foregroundStyle(tuple.shapeStyle).frame(maxWidth: .infinity).padding().border(Color.black).fixedSize(horizontal: false, vertical: true)
+    private func buttonForegroundStyle(_ buttonview: ButtonView) -> AnyView {
+        let font1 = buttonview.font1
+        var arr = ListShapeStyle.getList(.foreground)
+        let view = VStack(alignment: .center, spacing: buttonview.spacing) {
+            Text("foregroundStyle").font(font1).bold().frame(maxWidth: .infinity).background(Color.black).foregroundColor(.white)
+            VStack(alignment: .center, spacing: buttonview.spacing) {
+                ForEach(0..<arr.count, id: \.self) { i in
+                    let tuple = arr[i]
+                    Button("Button\nShapeStyle : \(tuple.name)", action: {}).font(font1).foregroundStyle(tuple.shapeStyle).frame(maxWidth: .infinity).padding().border(Color.black).fixedSize(horizontal: false, vertical: true)
                 }
                 if #available(iOS 16.0, *) {
-                    Button("Button\nShapeStyle : \("TintShapeStyle")\n #available(iOS 16.0",action: {}).font(font1).frame(maxWidth: .infinity).padding().border(Color.black).fixedSize(horizontal: false, vertical: true).tint(Gradient(colors: [.red, .yellow, .green]))
+                    Button("Button\nShapeStyle : TintShapeStyle\n #available(iOS 16.0", action: {}).font(font1).frame(maxWidth: .infinity).padding().border(Color.black).fixedSize(horizontal: false, vertical: true).tint(Gradient(colors: [.red, .yellow, .green]))
                 }
             }
-            
-            
         }
         return AnyView(view)
     }
-    let buttonBackgroundStyle:((ButtonView)->AnyView)={
-        (buttonview:ButtonView) in
-        // foregroundStyle
-        let font1=buttonview.font1
-        var arr=ListShapeStyle.getList(.background)
-        let view=MyCustomContainer(buttonview, "backgroundStyle"){
-            VStack(alignment:.center,spacing:buttonview.spacing){
-                ForEach((0..<arr.count),id: \.self){
-                    i in
-                    let tuple=arr[i]
-                    Button("Button\nShapeStyle : \(tuple.name)",action: {}).font(font1).frame(maxWidth: .infinity).foregroundColor(.white).padding().border(Color.black).fixedSize(horizontal: false, vertical: true).background(tuple.shapeStyle)
+    private func buttonBackgroundStyle(_ buttonview: ButtonView) -> AnyView {
+        let font1 = buttonview.font1
+        var arr = ListShapeStyle.getList(.background)
+        let view = VStack(alignment: .center, spacing: buttonview.spacing) {
+            Text("backgroundStyle").font(font1).bold().frame(maxWidth: .infinity).background(Color.black).foregroundColor(.white)
+            VStack(alignment: .center, spacing: buttonview.spacing) {
+                ForEach(0..<arr.count, id: \.self) { i in
+                    let tuple = arr[i]
+                    Button("Button\nShapeStyle : \(tuple.name)", action: {}).font(font1).frame(maxWidth: .infinity).foregroundColor(.white).padding().border(Color.black).fixedSize(horizontal: false, vertical: true).background(tuple.shapeStyle)
                 }
                 if #available(iOS 16.0, *) {
-                    Button("Button\nShapeStyle : \("TintShapeStyle")\n #available(iOS 16.0",action: {}).font(font1).frame(maxWidth: .infinity).fixedSize(horizontal: false, vertical: true).background(Gradient(colors: [.red, .yellow, .green]))
+                    Button("Button\nShapeStyle : TintShapeStyle\n #available(iOS 16.0", action: {}).font(font1).frame(maxWidth: .infinity).fixedSize(horizontal: false, vertical: true).background(Gradient(colors: [.red, .yellow, .green]))
                 }
             }
-            
-            
         }
         return AnyView(view)
     }
@@ -160,19 +149,7 @@ struct MyCustomContainer<Content: View>:View{
     }
 }
 
-//private struct MyButtonView<S>: View where S:PrimitiveButtonStyle{
-//    let subText:String
-//    var buttonStyle:S
-//    let font1=Font.title
-//    let font2=Font.title3
-//    var body: some View {
-//        VStack(alignment: .center,spacing: 5){
-//            Button("Button",action: {}).buttonStyle(buttonStyle).font(font1)
-//            Text(subText).font(font2)
-//        }
-//
-//    }
-//}
+
 private struct ButtonStyleTintBGColor:ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
