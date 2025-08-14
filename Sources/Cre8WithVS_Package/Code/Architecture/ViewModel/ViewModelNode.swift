@@ -105,7 +105,7 @@ class ViewModelNode: ObservableObject, FWLoggerDelegate {
         let task = Task.detached(priority: .userInitiated) { [weak self] () -> [ViewModelNode] in
             guard let self = self else { return [] }
 //            Global.logThreadType(tag: tag)
-            try? await Task.sleep(nanoseconds: 3_000_000_000)
+//            try? await Task.sleep(nanoseconds: 3_000_000_000)
             return try await self.search(searchText)
         }
 

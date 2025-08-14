@@ -5,9 +5,10 @@
 //  Created by Vijay Sachan on 6/23/25.
 //
 import SwiftUI
+import SPiOSCommonP8
 class VMView: ViewModelNode{
     override nonisolated func createRootModelAndChildViewModels() async -> (ModelNode, [ViewModelNode]) {
-        logCurrentThread()
+        Global.logThreadType(tag: tag)
         let node=ModelNode( "View", "SwiftUI elements, showcasing various interactive and display components", "platforms")
         let vmChildNodes:[ViewModelNode] = [
             await VMView(ModelNode("Button", "Triggers actions via tappable components", "All"), { _ in AnyView(ButtonView()) }),

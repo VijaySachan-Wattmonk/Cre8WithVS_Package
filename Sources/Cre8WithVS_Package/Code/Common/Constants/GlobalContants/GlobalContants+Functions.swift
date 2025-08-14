@@ -12,7 +12,7 @@ func makeView(_ view:some View)async -> ()->AnyView{
         return AnyView(ViewContainer(content: view))
     }
 }
-func logCurrentThread(function: String = #function) {
-    let threadType = Thread.isMainThread ? "🟢 Main Thread" : "🔴 Background Thread"
-    print("🔍 [\(function)] → \(threadType)")
-}
+//func logCurrentThread(function: String = #function) {
+//    let threadType = Thread.isMainThread ? "🟢 Main Thread" : "🔴 Background Thread"
+//    print("🔍 [\(function)] → \(threadType)")
+//}

@@ -5,9 +5,10 @@
 //  Created by Vijay Sachan on 6/23/25.
 //
 import SwiftUI
+import SPiOSCommonP8
 class VMContainerViews: ViewModelNode{
     override nonisolated func createRootModelAndChildViewModels() async -> (ModelNode, [ViewModelNode]) {
-        logCurrentThread()
+        Global.logThreadType(tag: tag)
         let node=ModelNode( "Container views", "SwiftUI provides a range of container views that group and repeat views. Use this purely for structure and layout", "platforms")
         let vmChildNodes:[ViewModelNode] = [
             await VMContainerViews(ModelNode("HStack", "Arranges child views in a horizontal line", "All"), { _ in AnyView(HStackDemo()) }),
