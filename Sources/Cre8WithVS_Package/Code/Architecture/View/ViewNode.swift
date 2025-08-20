@@ -52,7 +52,7 @@ struct ViewNode: View, FWLoggerDelegate {
                 }
             }
             .navigationTitle(rootNode.title)
-            .if(isSearchBarVisible) { view in
+            .ex_If(isSearchBarVisible) { view in
                 view.searchable(text: $viewModel.searchText, prompt: "Search")
             }
         } else {
@@ -61,12 +61,4 @@ struct ViewNode: View, FWLoggerDelegate {
     }
 }
 
-extension View {
-    @ViewBuilder func `if`<Content: View>(_ condition: Bool, transform: (Self) -> Content) -> some View {
-        if condition {
-            transform(self)
-        } else {
-            self
-        }
-    }
-}
+
