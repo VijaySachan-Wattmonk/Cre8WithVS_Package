@@ -5,8 +5,6 @@
 //  Created by Vijay Sachan on 6/18/25.
 //
 import SwiftUI
-
-
 struct ViewNode123: View {
     var viewModel: ViewModelNode
     @State private var searchText: String = ""
