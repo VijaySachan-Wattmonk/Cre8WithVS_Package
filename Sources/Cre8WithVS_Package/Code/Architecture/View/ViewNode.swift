@@ -52,7 +52,7 @@ struct ViewNode: View, FWLoggerDelegate {
                 }
             }
             .navigationTitle(rootNode.title)
-            .ex_If(isSearchBarVisible) { view in
+            .ext_If(isSearchBarVisible) { view in
                 view.searchable(text: $viewModel.searchText, prompt: "Search")
             }
         } else {
@@ -60,5 +60,3 @@ struct ViewNode: View, FWLoggerDelegate {
         }
     }
 }
-
-

@@ -13,7 +13,8 @@ class VMSwiftUI: ViewModelNode{
         let vmChildNodes:[ViewModelNode] = [
             await VMView(),
             await VMContainerViews(),
-            await VMSwiftUI(ModelNode( "ZStack", "Layered views", "All"),{_ in AnyView(ZStackDemo())})
+            await VMNavigation()
+            /*await VMSwiftUI(ModelNode( "ZStack", "Layered views", "All"),{_ in AnyView(ZStackDemo())})*/
         ]
         return (node,vmChildNodes)
     }
