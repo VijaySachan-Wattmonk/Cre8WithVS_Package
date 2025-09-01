@@ -15,7 +15,7 @@ class VMNavigation: ViewModelNode{
             "platforms"
         )
         let vmChildNodes:[ViewModelNode] = [
-//            await VMContainerViews(ModelNode("HStack", "Arranges child views in a horizontal line", "All"), { _ in AnyView(HStackDemo()) }),
+            await VMContainerViews(ModelNode("NavigationSplitView", "A view that presents views in two or three columns, where selections in leading columns control presentations in subsequent columns.", "All"), { _ in AnyView(NavigationSplitViewDemo()) }),
 
 
         ]

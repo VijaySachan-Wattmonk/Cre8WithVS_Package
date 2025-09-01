@@ -21,5 +21,4 @@ class VMView: ViewModelNode{
         ]
         return (node,vmChildNodes)
     }
-    
 }

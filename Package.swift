@@ -4,7 +4,7 @@ import PackageDescription
 let package = Package(
     name: "Cre8WithVS_Package",
     platforms: [
-            .iOS(.v16), // 👈 Change to your minimum supported iOS version
+            .iOS(.v17), // 👈 Change to your minimum supported iOS version
             //.macOS(.v12),
             //.tvOS(.v13),
             //.watchOS(.v6)
