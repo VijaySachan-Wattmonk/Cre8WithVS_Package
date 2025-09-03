@@ -136,16 +136,21 @@ struct NavigationSplitViewDemo: View{
        }.fullScreenCover(isPresented:$present) { // Use a modal presentation to keep `NavigationSplitView` at the top level
            VStack(spacing: 0){
                HStack(spacing:10){
+                   Button(action: {
+                       dismiss()
+                   }) {
+                       HStack{
+                           Image(systemName: "chevron.backward")
+                               .font(.system(size: 18, weight: .semibold))
+                           Text("Back")
+                       }.foregroundColor(.blue)
+                   }
+                   .buttonStyle(.plain)
+                   .accessibilityLabel("Back")
                    Spacer()
                    ViewInfoIconButton(title: "kfnsd",message: infoText,onClose: {
                        
                    })
-                   Button {
-                       dismiss()
-                   } label: {
-                       Image(systemName: "xmark.circle")
-                   }
-
                }
                // MARK: Layout controls – choose between 2 or 3 columns
                Picker("Layout", selection: $layout) {
@@ -195,7 +200,9 @@ struct NavigationSplitViewDemo: View{
                    }
                }
                
-           }.padding()
+           }
+           .padding(.horizontal)
+           .padding(.bottom)
                .onChange(of: layout) { oldValue, newValue in
                    // When the number of columns changes, force a fresh identity so the
                    // split view reconstructs cleanly.
