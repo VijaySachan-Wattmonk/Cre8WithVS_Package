@@ -15,7 +15,6 @@ struct SidebarView: View {
         .padding([.horizontal, .top])
     }
 }
-
 struct ContentView: View {
     let items: [String]
     @Binding var selection: String?
@@ -66,6 +65,15 @@ enum VisibilityOption: String, CaseIterable, Identifiable, Hashable {
     case doubleColumn = "doubleColumn : Show the content column and detail area of a three-column navigation split view, or the sidebar column and detail area of a two-column navigation split view."
     case detailOnly = "detailOnly : Hide the leading two columns of a three-column navigation split view, so that just the detail area shows."
     var id: Self { self }
+    
+    var shortTitle: String {
+        switch self {
+        case .automatic:    return "automatic"
+        case .all:          return "all"
+        case .doubleColumn: return "doubleColumn"
+        case .detailOnly:   return "detailOnly"
+        }
+    }
 
     var toSplitVisibility: NavigationSplitViewVisibility {
         switch self {
@@ -111,6 +119,27 @@ enum ColumnOption: String, CaseIterable, Identifiable, Hashable {
     }
 }
 
+enum SplitStyleOption: String, CaseIterable, Identifiable, Hashable {
+    case automatic = "automatic"
+    case balanced = "balanced"
+    case prominentDetail = "prominentDetail"
+    var id: Self { self }
+}
+
+extension View {
+    @ViewBuilder
+    func applySplitStyle(_ option: SplitStyleOption) -> some View {
+        switch option {
+        case .automatic:
+            self.navigationSplitViewStyle(.automatic)
+        case .balanced:
+            self.navigationSplitViewStyle(.balanced)
+        case .prominentDetail:
+            self.navigationSplitViewStyle(.prominentDetail)
+        }
+    }
+}
+
 struct NavigationSplitViewDemo: View{
     @Environment(\.dismiss) var dismiss
     @State private var layout: SplitLayout = .two // Default 3 columns
@@ -122,10 +151,11 @@ struct NavigationSplitViewDemo: View{
     /// A version token to force a rebuild of the split view subtree when layout changes.
     @State private var layoutVersion = UUID()
     // Controls the two-column split's visibility (automatic, all, doubleColumn, detailOnly)
-    @State private var columnVisibility: NavigationSplitViewVisibility = .automatic
-    @State private var visibilityOption: VisibilityOption = .automatic
+    @State private var columnVisibility: NavigationSplitViewVisibility = .all
+    @State private var visibilityOption: VisibilityOption = .all
     @State private var preferredColumn: NavigationSplitViewColumn = .sidebar
     @State private var preferredOption: ColumnOption = .sidebar
+    @State private var splitStyle: SplitStyleOption = .automatic
     @State var present: Bool = false
     var body: some View {
        ZStack{
@@ -142,42 +172,76 @@ struct NavigationSplitViewDemo: View{
                        HStack{
                            Image(systemName: "chevron.backward")
                                .font(.system(size: 18, weight: .semibold))
-                           Text("Back")
+//                           Text("Back")
                        }.foregroundColor(.blue)
                    }
                    .buttonStyle(.plain)
                    .accessibilityLabel("Back")
                    Spacer()
+                   Text("NavigationSplitView")
+                   Spacer()
                    ViewInfoIconButton(title: "kfnsd",message: infoText,onClose: {
                        
                    })
                }
-               // MARK: Layout controls – choose between 2 or 3 columns
-               Picker("Layout", selection: $layout) {
-                   ForEach(Array(SplitLayout.allCases.enumerated()), id: \.element) { index, option in
-                       Text("\(option.rawValue)").tag(option)
-                   }
-               }
-               .pickerStyle(.segmented)
-               .padding()
-                   Section(header: Text("NavigationSplitViewVisibility : The visibility of the leading columns in a navigation split view.")){
-                       Picker("ColumnVisibility", selection: $visibilityOption) {
-                           ForEach(VisibilityOption.allCases) { opt in
-                               Text(opt.rawValue).tag(opt)
-                           }
-                       }
-                       .pickerStyle(.menu)
-                       .padding(.horizontal)
-                   }
-               Section(header: Text("NavigationSplitViewColumn : A NavigationSplitView collapses into a single stack in some contexts, like on iPhone or Apple Watch. Use this type with the preferredCompactColumn parameter to control which column of the navigation split view appears on top of the collapsed stack.")){
-                   Picker("Preferred", selection: $preferredOption) {
-                       ForEach(ColumnOption.allCases) { opt in
-                           Text(opt.rawValue).tag(opt)
-                       }
-                   }
-                   .pickerStyle(.menu)
-                   .padding(.horizontal)
-               }
+                // MARK: Control Bar — choose layout, visibility, and preferred compact column
+               VStack(alignment: .leading, spacing: 12) {
+                    // Row 1: SplitLayout (2 or 3 columns)
+                    HStack(spacing: 12) {
+                        Picker("Layout", selection: $layout) {
+                            ForEach(SplitLayout.allCases) { option in
+                                Text(option.rawValue).tag(option)
+                            }
+                        }
+                        .pickerStyle(.segmented)
+                    }
+
+                    // Row 2: Column Visibility (automatic/all/double/detail)
+                    VStack(spacing: 12) {
+                        HStack{
+                            Text(NavigationSplitViewVisibilityTuple.title).font(.subheadline).foregroundStyle(.secondary)
+                            ViewInfoIconButton(title: NavigationSplitViewVisibilityTuple.title, message: NavigationSplitViewVisibilityTuple.desc, onClose: {})
+                            Picker("Visibility", selection: $visibilityOption) {
+                                ForEach(VisibilityOption.allCases) { opt in
+                                    Text(opt.shortTitle).tag(opt)
+                                }
+                            }
+                            .pickerStyle(.menu)
+                        }
+                        
+                    }
+
+                    // Row 3: Preferred Compact Column (sidebar/content/detail)
+                    VStack(spacing: 12) {
+                        HStack{
+                            Text(NavigationSplitViewColumnTuple.title).font(.subheadline).foregroundStyle(.secondary)
+                            ViewInfoIconButton(title: NavigationSplitViewColumnTuple.title, message: NavigationSplitViewColumnTuple.desc, onClose: {})
+                            Picker("Preferred", selection: $preferredOption) {
+                                ForEach(ColumnOption.allCases) { opt in
+                                    Text(opt.rawValue).tag(opt)
+                                }
+                            }
+                            .pickerStyle(.menu)
+                        }
+                    }
+                    // Row 4: Navigation Split View Style (automatic/balanced/prominentDetail)
+                    VStack(spacing: 12) {
+                        HStack {
+                            Text("navigationSplitViewStyle:")
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                            ViewInfoIconButton(title: NavigationSplitViewStyleTuple.title, message: NavigationSplitViewStyleTuple.desc, onClose: {})
+                            Picker("Style", selection: $splitStyle) {
+                                ForEach(SplitStyleOption.allCases) { opt in
+                                    Text(opt.rawValue).tag(opt)
+                                }
+                            }
+                            .pickerStyle(.menu)
+                        }
+                    }
+                }
+                .padding(.horizontal)
+                .padding(.bottom, 8)
                
                // MARK: Split view – rebuilt when `layoutVersion` changes
                Group {
@@ -199,6 +263,7 @@ struct NavigationSplitViewDemo: View{
                        }
                    }
                }
+               .applySplitStyle(splitStyle)
                
            }
            .padding(.horizontal)
@@ -215,7 +280,7 @@ struct NavigationSplitViewDemo: View{
            .onChange(of: preferredOption) { _, newValue in
                preferredColumn = newValue.toSplitColumn
            }
-           .onAppear {
+           .onAppear{
                // Keep pickers in sync with initial values
                visibilityOption = VisibilityOption.from(columnVisibility)
                preferredOption = ColumnOption.from(preferredColumn)
@@ -224,10 +289,40 @@ struct NavigationSplitViewDemo: View{
        }
     }
 }
+
 #Preview {
     // Keep the split view top-level to mirror the fullScreenCover behavior.
     NavigationSplitViewDemo()
 }
+
+let NavigationSplitViewColumnTuple=(title:"NavigationSplitViewColumn",desc:"A NavigationSplitView collapses into a single stack in some contexts, like on iPhone or Apple Watch. Use this type with the preferredCompactColumn parameter to control which column of the navigation split view appears on top of the collapsed stack.")
+let NavigationSplitViewVisibilityTuple=(title:"NavigationSplitViewVisibility",desc:"""
+The visibility of the leading columns in a navigation split view.
+
+1. automatic : Use the default leading column visibility for the current device.
+
+2. all : Show all the columns of a three-column navigation split view.
+
+3. doubleColumn : Show the content column and detail area of a three-column navigation split view, or the sidebar column and detail area of a two-column navigation split view.
+
+4. detailOnly : Hide the leading two columns of a three-column navigation split view, so that just the detail area shows.
+
+Note : Some platforms don’t respect every option. For example, macOS always displays the content column.
+
+
+
+""")
+
+let NavigationSplitViewStyleTuple = (title: "navigationSplitViewStyle(_:)", desc: """
+Controls visual emphasis and column prominence.
+
+1. automatic : It resolves its appearance automatically based on the current context.
+
+2. balanced : It reduces the size of the detail content to make room when showing the leading column or columns.
+
+3. prominentDetail : It attempts to maintain the size of the detail content when hiding or showing the leading columns.
+""")
+
 private let infoText="""
 1. Embedding "NavigationSplitView" in "NavigationStack" doesnot work properly.So 
 presenting this demo using method "fullScreenCover(isPresented:onDismiss:content:)"
