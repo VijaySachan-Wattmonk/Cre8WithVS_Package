@@ -143,8 +143,9 @@ extension View {
 struct NavigationSplitViewDemo: View{
     @Environment(\.dismiss) var dismiss
     @State private var layout: SplitLayout = .two // Default 3 columns
-    @State private var sidebarSelection: String? = "Inbox"
-    @State private var contentSelection: String? = "Item 1"
+    @State private var sidebarSelection: String? = nil//"Inbox"
+//    @State private var contentSelection: String? = "Item 1"
+    @State private var contentSelection: String? = nil
     
     private let listSidebar = ["Side bar item 1", "Side bar item 2", "Side bar item 3", "Side bar item 4"]
     private let listContent = (1...20).map { "Content Item \($0)" }
