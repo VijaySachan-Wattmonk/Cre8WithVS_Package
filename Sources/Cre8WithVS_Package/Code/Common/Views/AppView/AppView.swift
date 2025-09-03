@@ -24,8 +24,8 @@ struct AppView<Content: View>:View{
         .onDisappear{
             code.onDisappear()
         }
-        .onChange(of: scenePhase) { (phase) in
-            code.onChange(scenePhase: phase)
+        .onChange(of: scenePhase) { (oldValue,newValue) in
+            code.onChange(scenePhase: newValue)
         }
     }
 }

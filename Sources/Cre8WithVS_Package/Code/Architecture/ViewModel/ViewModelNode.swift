@@ -31,6 +31,7 @@ class ViewModelNode: ObservableObject, FWLoggerDelegate {
     // MARK: - Async Load
     func loadDataAsync() async {
         let node = await Task.detached(priority: .userInitiated) {
+            try? await Task.sleep(nanoseconds: 1_000_000_000) // 1 second
             return await self.setUp()
         }.value
         self.rootNode = node

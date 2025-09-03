@@ -48,7 +48,7 @@ struct TabViewSwiftUI: View {
                     }
                 }
             }
-        }.onChange(of: selectedTab) { newValue in
+        }.onChange(of: selectedTab) { (oldValue,newValue) in
             /**
                              When page will change this code will invoke
              */

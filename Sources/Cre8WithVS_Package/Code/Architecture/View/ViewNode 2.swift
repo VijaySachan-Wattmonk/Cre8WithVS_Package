@@ -40,7 +40,7 @@ struct ViewNode123: View {
             }
             .navigationTitle(rootNode.title)
             .searchable(text: $searchText, prompt: "Search")
-            .onChange(of: searchText) { _ in
+            .onChange(of: searchText) { (oldValue,newValue) in
                 performSearch()
             }
             .onAppear {

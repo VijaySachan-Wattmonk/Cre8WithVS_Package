@@ -1,8 +1,9 @@
 
 import SwiftUI
 import Foundation
-public struct ViewCre8WithVS: View {
-    @StateObject private var viewModel=VMSwiftUI() 
+import SPiOSCommonP8
+public struct ViewCre8WithVS: View,FWLoggerDelegate {
+    @StateObject private var viewModel=VMSwiftUI()
     public init(){
         
     }
@@ -17,7 +18,9 @@ public struct ViewCre8WithVS: View {
         }
         .task {
             if viewModel.rootNode == nil {
+                Global.logThreadType(tag: tag)
                 await viewModel.loadDataAsync()
+                viewModel.filteredViewModels=viewModel.childViewModel
             }
         }
     }
