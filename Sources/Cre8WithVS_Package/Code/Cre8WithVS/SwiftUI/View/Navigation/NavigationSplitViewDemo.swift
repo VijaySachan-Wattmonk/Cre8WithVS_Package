@@ -140,6 +140,104 @@ extension View {
     }
 }
 
+struct SplitSettingsView: View {
+    @Binding var isPresented: Bool
+    @Binding var layout: SplitLayout
+    @Binding var visibilityOption: VisibilityOption
+    @Binding var preferredOption: ColumnOption
+    @Binding var splitStyle: SplitStyleOption
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section("Layout") {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Picker("No of columns", selection: $layout) {
+                            ForEach(SplitLayout.allCases) { option in
+                                Text(option.rawValue).tag(option)
+                            }
+                        }
+                        .pickerStyle(.menu)
+                        Text("Select how many columns you want to display.")
+                            .foregroundStyle(.secondary)
+                            .pkg_FontSubTitle()
+                        Text(NavigationSplitViewColumnsTuple.desc)
+                            .foregroundStyle(.secondary)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .padding(.top, 2)
+                            .pkg_FontSubTitle()
+                    }
+                }
+
+                Section(NavigationSplitViewVisibilityTuple.title) {
+                    
+                    Picker("Visibility", selection: $visibilityOption) {
+                        ForEach(VisibilityOption.allCases) { opt in
+                            Text(opt.shortTitle).tag(opt)
+                        }
+                    }
+                    .pickerStyle(.menu)
+                    Text(NavigationSplitViewVisibilityTuple.desc)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .padding(.vertical, 4)
+                        .pkg_FontSubTitle()
+                }
+
+                Section(NavigationSplitViewColumnTuple.title) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Picker("Preferred", selection: $preferredOption) {
+                            ForEach(ColumnOption.allCases) { opt in
+                                Text(opt.rawValue).tag(opt)
+                            }
+                        }
+                        .pickerStyle(.menu)
+
+                        Text(NavigationSplitViewColumnTuple.desc)
+                            .foregroundStyle(.secondary)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .padding(.vertical, 4)
+                            .pkg_FontSubTitle()
+                    }
+                }
+
+                Section(NavigationSplitViewStyleTuple.title) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Picker("Style", selection: $splitStyle) {
+                            ForEach(SplitStyleOption.allCases) { opt in
+                                Text(opt.rawValue).tag(opt)
+                            }
+                        }
+                        .pickerStyle(.menu)
+
+                        Text(NavigationSplitViewStyleTuple.desc)
+                            .foregroundStyle(.secondary)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .padding(.vertical, 4)
+                            .pkg_FontSubTitle()
+                    }
+                }
+
+                Section(NavigationSplitViewColumnWidthTuple.title) {
+                    Text(NavigationSplitViewColumnWidthTuple.desc)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .padding(.vertical, 4)
+                        .pkg_FontSubTitle()
+                }
+            }
+            .navigationTitle("Split Settings")
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Done") { isPresented = false }
+                }
+            }
+        }
+        .presentationDetents([/*.medium, */.large])
+        .presentationDragIndicator(.visible)
+    }
+}
+
 struct NavigationSplitViewDemo: View{
     @Environment(\.dismiss) var dismiss
     @State private var layout: SplitLayout = .two // Default 3 columns
@@ -157,6 +255,7 @@ struct NavigationSplitViewDemo: View{
     @State private var preferredColumn: NavigationSplitViewColumn = .sidebar
     @State private var preferredOption: ColumnOption = .sidebar
     @State private var splitStyle: SplitStyleOption = .automatic
+    @State private var showSettings = false
     @State var present: Bool = false
     var body: some View {
        ZStack{
@@ -181,68 +280,55 @@ struct NavigationSplitViewDemo: View{
                    Spacer()
                    Text("NavigationSplitView")
                    Spacer()
-                   ViewInfoIconButton(title: "kfnsd",message: infoText,onClose: {
+                   ViewInfoIconButton(title: "NavigationSplitView",message: infoText,onClose: {
                        
                    })
                }
-                // MARK: Control Bar — choose layout, visibility, and preferred compact column
-               VStack(alignment: .leading, spacing: 12) {
-                    // Row 1: SplitLayout (2 or 3 columns)
-                    HStack(spacing: 12) {
-                        Picker("Layout", selection: $layout) {
-                            ForEach(SplitLayout.allCases) { option in
-                                Text(option.rawValue).tag(option)
-                            }
-                        }
-                        .pickerStyle(.segmented)
-                    }
-
-                    // Row 2: Column Visibility (automatic/all/double/detail)
-                    VStack(spacing: 12) {
-                        HStack{
-                            Text(NavigationSplitViewVisibilityTuple.title).font(.subheadline).foregroundStyle(.secondary)
-                            ViewInfoIconButton(title: NavigationSplitViewVisibilityTuple.title, message: NavigationSplitViewVisibilityTuple.desc, onClose: {})
-                            Picker("Visibility", selection: $visibilityOption) {
-                                ForEach(VisibilityOption.allCases) { opt in
-                                    Text(opt.shortTitle).tag(opt)
-                                }
-                            }
-                            .pickerStyle(.menu)
-                        }
-                        
-                    }
-
-                    // Row 3: Preferred Compact Column (sidebar/content/detail)
-                    VStack(spacing: 12) {
-                        HStack{
-                            Text(NavigationSplitViewColumnTuple.title).font(.subheadline).foregroundStyle(.secondary)
-                            ViewInfoIconButton(title: NavigationSplitViewColumnTuple.title, message: NavigationSplitViewColumnTuple.desc, onClose: {})
-                            Picker("Preferred", selection: $preferredOption) {
-                                ForEach(ColumnOption.allCases) { opt in
-                                    Text(opt.rawValue).tag(opt)
-                                }
-                            }
-                            .pickerStyle(.menu)
-                        }
-                    }
-                    // Row 4: Navigation Split View Style (automatic/balanced/prominentDetail)
-                    VStack(spacing: 12) {
-                        HStack {
-                            Text("navigationSplitViewStyle:")
-                                .font(.subheadline)
-                                .foregroundStyle(.secondary)
-                            ViewInfoIconButton(title: NavigationSplitViewStyleTuple.title, message: NavigationSplitViewStyleTuple.desc, onClose: {})
-                            Picker("Style", selection: $splitStyle) {
-                                ForEach(SplitStyleOption.allCases) { opt in
-                                    Text(opt.rawValue).tag(opt)
-                                }
-                            }
-                            .pickerStyle(.menu)
-                        }
-                    }
-                }
-                .padding(.horizontal)
-                .padding(.bottom, 8)
+               // MARK: Settings launcher
+               HStack {
+                   Spacer()
+                   Button {
+                       showSettings = true
+                   } label:{
+                       Label("Configure", systemImage: "gearshape")
+                   }
+                   .buttonStyle(.bordered)
+               }
+               .padding(.horizontal)
+               .padding(.bottom, 8)
+               .sheet(isPresented: $showSettings) {
+                   SplitSettingsView(isPresented: $showSettings,
+                                     layout: $layout,
+                                     visibilityOption: $visibilityOption,
+                                     preferredOption: $preferredOption,
+                                     splitStyle: $splitStyle)
+               }
+               
+               // Current selection summary (compact chip)
+               VStack(spacing: 4) {
+                   Text("Current Settings")
+                       .font(.footnote)
+                       .foregroundStyle(.secondary)
+                   HStack(spacing: 8) {
+                       Label(layout.rawValue, systemImage: "square.split.2x1")
+                       Divider()
+                       Label(visibilityOption.shortTitle, systemImage: "eye")
+                       Divider()
+                       Label(preferredOption.rawValue, systemImage: "list.bullet")
+                       Divider()
+                       Label(splitStyle.rawValue, systemImage: "paintbrush")
+                   }
+                   .font(.caption)
+                   .padding(.vertical, 4)
+                   .padding(.horizontal, 10)
+                   .background(
+                       RoundedRectangle(cornerRadius: 10)
+                           .fill(Color(.secondarySystemBackground))
+                   )
+                   .fixedSize(horizontal: false, vertical: true)
+               }
+               .padding(.horizontal)
+               .padding(.bottom, 8)
                
                // MARK: Split view – rebuilt when `layoutVersion` changes
                Group {
@@ -324,9 +410,39 @@ Controls visual emphasis and column prominence.
 3. prominentDetail : It attempts to maintain the size of the detail content when hiding or showing the leading columns.
 """)
 
+let NavigationSplitViewColumnWidthTuple = (title: "Set column width", desc: """
+1. navigationSplitViewColumnWidth(_:) : Sets a fixed, preferred width for the column containing this view.
+
+2. navigationSplitViewColumnWidth(min:ideal:max:) : 
+Control the minimum/ideal/maximum width for a column in a NavigationSplitView.
+
+- Use this modifier on the **column's content**, not on the outer split view.
+- It can help readability on iPad/Mac by preventing columns from becoming too narrow or too wide.
+
+**Example:**
+```
+.sidebar
+    .navigationSplitViewColumnWidth(min: 240, ideal: 300, max: 400)
+```
+
+**Notes**
+1. Widths are **hints**; the system may adjust depending on device and style.
+2. The modifier applies to the **current column scope** (e.g., inside the sidebar/content/detail closures).
+3. On compact width (iPhone), widths have little effect because columns collapse to a stack.
+""")
+
 private let infoText="""
 1. Embedding "NavigationSplitView" in "NavigationStack" doesnot work properly.So 
 presenting this demo using method "fullScreenCover(isPresented:onDismiss:content:)"
 
  
 """
+
+let NavigationSplitViewColumnsTuple = (
+    title: "Columns in layout",
+    desc: """
+            In a 2-column NavigationSplitView: **Sidebar** and **Detail** are displayed
+
+            In a 3-column NavigationSplitView: **Sidebar**, **Content**, and **Detail** are displayed.
+         """
+)
