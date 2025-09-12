@@ -8,15 +8,15 @@
 import SwiftUI
 
 enum StackAlignment: String, CaseIterable, Hashable {
+    case top
     case topLeading
     case topTrailing
-    case center
     case bottomLeading
     case bottomTrailing
-    case top
     case bottom
     case leading
     case trailing
+    case center
     case leadingFirstTextBaseline
     case trailingFirstTextBaseline
     case centerFirstTextBaseline
@@ -64,6 +64,10 @@ enum StackAlignment: String, CaseIterable, Hashable {
     }
 }
 struct ZStackDemo: View{
+    @State private var selectedAlignment: StackAlignment = .center
+    
+    let selectableAlignments: [StackAlignment] = [.top,.topLeading, .topTrailing, .bottom, .bottomLeading, .bottomTrailing,.leading, .trailing,.center]
+    
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
@@ -71,70 +75,43 @@ struct ZStackDemo: View{
                 Text("ZStack Alignment Examples")
                     .font(.headline)
                     .frame(maxWidth: .infinity)
-                
                 Text("Getting top guides").font(.title2).bold()
-                
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("1. Alignment: \(StackAlignment.topLeading.title)")
-                    AlignmentDemoView(stackAlignment: .topLeading)
+                HStack {
+                    Text("Select Alignment: ")
+                    
+                    Picker("Alignment", selection: $selectedAlignment) {
+                        ForEach(selectableAlignments, id: \.self) { alignment in
+                            Text(alignment.title)
+                        }
+                    }
                 }
-                Divider()
-                
+                .pickerStyle(.menu)
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("2. Alignment: \(StackAlignment.top.title)")
-                    AlignmentDemoView(stackAlignment: .top)
+                    CommonAlignmentDemoView(stackAlignment: selectedAlignment)
                 }
-                Divider()
-                
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("3. Alignment: \(StackAlignment.topTrailing.title)")
-                    AlignmentDemoView(stackAlignment: .topTrailing)
-                }
-                Divider()
-                
-                Text("Getting middle guides").font(.title2).bold()
-                
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("4. Alignment: \(StackAlignment.leading.title)")
-                    AlignmentDemoView(stackAlignment: .leading)
-                }
-                Divider()
-                
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("5. Alignment: \(StackAlignment.center.title)")
-                    AlignmentDemoView(stackAlignment: .center)
-                }
-                Divider()
-                
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("6. Alignment: \(StackAlignment.trailing.title)")
-                    AlignmentDemoView(stackAlignment: .trailing)
-                }
-                Divider()
-                
-                Text("Getting bottom guides").font(.title2).bold()
-                
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("7. Alignment: \(StackAlignment.bottomLeading.title)")
-                    AlignmentDemoView(stackAlignment: .bottomLeading)
-                }
-                Divider()
-                
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("8. Alignment: \(StackAlignment.bottom.title)")
-                    AlignmentDemoView(stackAlignment: .bottom)
-                }
-                Divider()
-                
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("9. Alignment: \(StackAlignment.bottomTrailing.title)")
-                    AlignmentDemoView(stackAlignment: .bottomTrailing)
-                }
-                Divider()
-                
                 BaselineGuidesDemoView()
             }
             .padding()
+        }
+    }
+}
+
+struct CommonAlignmentDemoView: View {
+    let stackAlignment: StackAlignment
+    var body: some View {
+        ZStack(alignment: stackAlignment.alignment){
+            Circle()
+                .fill(Color.red.opacity(0.85))
+                .frame(width: 60, height: 60)
+            RoundedRectangle(cornerRadius: 10)
+                .fill(Color.gray.opacity(0.15))
+                .frame(height: 100)
+            Text(stackAlignment.title)
+                .padding(6)
+                .background(Color.accentColor.opacity(0.85))
+                .foregroundColor(.white)
+                .cornerRadius(6)
+            
         }
     }
 }
@@ -163,13 +140,12 @@ struct CommonBaselineAlignmentView: View {
     let alignment: Alignment
     var body: some View {
         ZStack(alignment: alignment) {
-//            RoundedRectangle(cornerRadius: 10)
-//            HStack(alignment:.lastTextBaseline){
-                Text("0. Text at 0 index some more text, some more text, some more text Text at 0 index")
+            Circle()
+                .fill(Color.blue.opacity(0.85))
+                .frame(width: 60, height: 60)
+                Text("Text,  some more text, some more text, some more text,some more text,some more text")
                 .font(.largeTitle)//.background(Color.blue)
-            Text("1. Text at 1 index some more text, some more text, some more text some more text, some more text, some more text some more text, some more text, some more text Text at 1 index")
-                .font(.caption)
-//            }
+                
             Divider().frame(height: 1).background(Color.red)
         }.frame(height: 100).background(Color.gray.opacity(0.15))
             
