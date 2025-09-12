@@ -8,16 +8,15 @@
 import SwiftUI
 import SPiOSCommonP8
 
-struct ViewNode: View, FWLoggerDelegate {
+struct ViewNode: View, FWLoggerDelegate{
     @State private var isSearchBarVisible: Bool = true
     @ObservedObject var viewModel: ViewModelNode
-
     var body: some View {
         if let rootNode = viewModel.rootNode {
-            ZStack {
+            ZStack{
                 let vmChildren = viewModel.filteredViewModels
                 if !vmChildren.isEmpty {
-                    List {
+                    List{
                         ForEach(Array(vmChildren.enumerated()), id: \.offset) { index, vm in
                             if let item = vm.rootNode {
                                 NavigationLink(destination: ViewNode(viewModel: vm)) {
@@ -26,7 +25,7 @@ struct ViewNode: View, FWLoggerDelegate {
                                         Text("\(item.subtitle)").pkg_FontSubTitle().foregroundColor(.gray)
                                     }
                                 }
-                            } else {
+                            } else{
                                 Text("rootNode is nil for index \(index)")
                             }
                         }
