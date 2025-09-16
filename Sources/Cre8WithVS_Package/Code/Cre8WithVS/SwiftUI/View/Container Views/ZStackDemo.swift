@@ -67,18 +67,12 @@ struct ZStackDemo: View{
     @State private var selectedAlignment: StackAlignment = .center
     
     let selectableAlignments: [StackAlignment] = [.top,.topLeading, .topTrailing, .bottom, .bottomLeading, .bottomTrailing,.leading, .trailing,.center]
-    
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 24) {
-//                BaselineGuidesDemoView()
-                Text("ZStack Alignment Examples")
-                    .font(.headline)
-                    .frame(maxWidth: .infinity)
-                Text("Getting top guides").font(.title2).bold()
-                HStack {
+        ScrollView(.vertical){
+            VStack(alignment: .leading, spacing: 24){
+                Text("Getting top, middle, bottom guides").font(.title2).bold()
+                HStack{
                     Text("Select Alignment: ")
-                    
                     Picker("Alignment", selection: $selectedAlignment) {
                         ForEach(selectableAlignments, id: \.self) { alignment in
                             Text(alignment.title)
@@ -90,33 +84,15 @@ struct ZStackDemo: View{
                     CommonAlignmentDemoView(stackAlignment: selectedAlignment)
                 }
                 BaselineGuidesDemoView()
+                AlignmentGuideView()
+                AlignmentGuideView2()
+                
             }
             .padding()
         }
     }
 }
-
 struct CommonAlignmentDemoView: View {
-    let stackAlignment: StackAlignment
-    var body: some View {
-        ZStack(alignment: stackAlignment.alignment){
-            Circle()
-                .fill(Color.red.opacity(0.85))
-                .frame(width: 60, height: 60)
-            RoundedRectangle(cornerRadius: 10)
-                .fill(Color.gray.opacity(0.15))
-                .frame(height: 100)
-            Text(stackAlignment.title)
-                .padding(6)
-                .background(Color.accentColor.opacity(0.85))
-                .foregroundColor(.white)
-                .cornerRadius(6)
-            
-        }
-    }
-}
-
-struct AlignmentDemoView: View{
     let stackAlignment: StackAlignment
     var body: some View{
         ZStack(alignment: stackAlignment.alignment){
@@ -133,6 +109,90 @@ struct AlignmentDemoView: View{
                 .cornerRadius(6)
             
         }
+    }
+}
+struct Circle1TrailingKey: AlignmentID {
+    static func defaultValue(in context: ViewDimensions) -> CGFloat {
+        context[HorizontalAlignment.center] // default to trailing edge
+    }
+}
+extension HorizontalAlignment {
+    static let circle1Trailing = HorizontalAlignment(Circle1TrailingKey.self)
+}
+struct AlignmentGuideView2: View{
+//    let stackAlignment: StackAlignment
+    let align=Alignment(horizontal:.leading, vertical: .bottom)
+    var body: some View{
+//        ZStack(alignment: Alignment(horizontal: /*.circle1Trailing*/.leading, vertical: .top)) {
+        ZStack(alignment: align){
+            // Circle1 sets the alignment guide
+//
+//            Color.gray.opacity(0.15)
+            Circle()
+                .fill(Color.green)
+                .frame(width: 60, height: 60)
+                .alignmentGuide(.leading) { context in
+                    context[HorizontalAlignment.trailing] // tell the stack: my trailing edge is the guide
+                }
+
+            // Circle2 positions itself relative to Circle1’s trailing edge
+            Circle()
+                .fill(Color.red)
+                .frame(width: 40, height: 40)
+//                .alignmentGuide(.leading) { context in
+//                    context[.trailing]  // place my leading 10pt to the right of Circle1’s trailing
+//                }
+            Circle()
+                .fill(Color.blue)
+                .frame(width: 20, height: 20)
+//                .alignmentGuide(.leading) { context in
+//                    context[.leading]  // place my leading 10pt to the right of Circle1’s trailing
+//                }
+        }
+        .frame(idealHeight: 200,alignment:align).background(Color.gray.opacity(0.15))
+    }
+}
+struct AlignmentGuideView: View{
+//    let stackAlignment: StackAlignment
+    var body: some View{
+        ZStack(alignment: .trailing) {
+//            Color.gray
+            Color.gray.opacity(0.15)
+            Circle()
+                .fill(Color.green.opacity(0.85))
+                .frame(width: 60, height: 60)
+            Circle()
+                .fill(Color.red.opacity(0.85))
+                .frame(width: 60, height: 60)
+                .alignmentGuide(.trailing) { context in
+                    print("Width: \(context.width)")
+                    print("Height: \(context.height)")
+                    print("Top: \(context[.top])")
+                    print("Bottom: \(context[.bottom])")
+                    print("Leading: \(context[.leading])")
+                    print("Trailing: \(context[.trailing])")
+                    print("FirstTextBaseline: \(context[.firstTextBaseline])")
+                    print("LastTextBaseline: \(context[.lastTextBaseline])")
+                    return context[.trailing]+10//context.width
+                    
+                }
+//                                    }
+//            Image(systemName: "mic.fill")
+//                .alignmentGuide(.bottom) { context in
+//                    //context[.bottom] - 0.2 * context.height
+//                    0
+//                }
+//            Text("Connecting")
+//                .font(.caption)
+            Text("Bryan")
+                .font(.title)
+//            Divider()
+//                .background(Color.red)
+        }
+        .frame(height:120)/*.background(Color.gray.opacity(0.15))*/
+//        .border(Color.blue, width: 2)
+//        .padding()
+        
     }
 }
 
@@ -153,47 +213,30 @@ struct CommonBaselineAlignmentView: View {
 }
 
 struct BaselineGuidesDemoView: View {
+    @State private var selectedBaselineAlignment: StackAlignment = .leadingFirstTextBaseline
+    let selectableBaselineAlignments: [StackAlignment] = [
+        .leadingFirstTextBaseline,
+        .trailingFirstTextBaseline,
+        .centerFirstTextBaseline,
+        .leadingLastTextBaseline,
+        .centerLastTextBaseline,
+        .trailingLastTextBaseline
+    ]
     var body: some View {
         VStack(alignment: .leading, spacing: 24) {
             Text("Getting text baseline guides").font(.title2).bold()
-            
-            VStack(alignment: .leading, spacing: 8) {
-                Text("10. Alignment: \(StackAlignment.leadingFirstTextBaseline.title)")
-                CommonBaselineAlignmentView(
-                    alignment: .leadingFirstTextBaseline
-                )
+            HStack {
+                Text("Select Alignment: ")
+                Picker("Baseline Alignment", selection: $selectedBaselineAlignment) {
+                    ForEach(selectableBaselineAlignments, id: \.self) { alignment in
+                        Text(alignment.title)
+                    }
+                }
             }
-            Divider()
-            
-            VStack(alignment: .leading, spacing: 8) {
-                Text("11. Alignment: \(StackAlignment.trailingFirstTextBaseline.title)")
-                CommonBaselineAlignmentView(alignment: .trailingFirstTextBaseline)
+            .pickerStyle(.menu)
+            VStack(alignment: .leading, spacing: 8){
+                CommonBaselineAlignmentView(alignment: selectedBaselineAlignment.alignment)
             }
-            Divider()
-            
-            VStack(alignment: .leading, spacing: 8) {
-                Text("12. Alignment: \(StackAlignment.centerFirstTextBaseline.title)")
-                CommonBaselineAlignmentView(alignment: .centerFirstTextBaseline)
-            }
-            Divider()
-            
-            VStack(alignment: .leading, spacing: 8) {
-                Text("13. Alignment: \(StackAlignment.leadingLastTextBaseline.title)")
-                CommonBaselineAlignmentView(alignment: .leadingLastTextBaseline)
-            }
-            Divider()
-            
-            VStack(alignment: .leading, spacing: 8) {
-                Text("14. Alignment: \(StackAlignment.centerLastTextBaseline.title)")
-                CommonBaselineAlignmentView(alignment: .centerLastTextBaseline)
-            }
-            Divider()
-            
-            VStack(alignment: .leading, spacing: 8) {
-                Text("15. Alignment: \(StackAlignment.trailingLastTextBaseline.title)")
-                CommonBaselineAlignmentView(alignment: .trailingLastTextBaseline)
-            }
-            Divider()
         }
     }
 }
