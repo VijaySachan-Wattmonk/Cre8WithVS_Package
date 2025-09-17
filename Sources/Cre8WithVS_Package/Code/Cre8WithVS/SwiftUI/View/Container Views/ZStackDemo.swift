@@ -73,6 +73,7 @@ struct ZStackDemo: View{
                 Text("Getting top, middle, bottom guides").font(.title2).bold()
                 HStack{
                     Text("Select Alignment: ")
+                    
                     Picker("Alignment", selection: $selectedAlignment) {
                         ForEach(selectableAlignments, id: \.self) { alignment in
                             Text(alignment.title)
@@ -84,8 +85,8 @@ struct ZStackDemo: View{
                     CommonAlignmentDemoView(stackAlignment: selectedAlignment)
                 }
                 BaselineGuidesDemoView()
-                AlignmentGuideView()
-                AlignmentGuideView2()
+//                AlignmentGuideView()
+//                AlignmentGuideView2()
                 
             }
             .padding()
@@ -222,17 +223,18 @@ struct BaselineGuidesDemoView: View {
         .centerLastTextBaseline,
         .trailingLastTextBaseline
     ]
-    var body: some View {
-        VStack(alignment: .leading, spacing: 24) {
+    var body: some View{
+        VStack(alignment: .leading, spacing: 24){
             Text("Getting text baseline guides").font(.title2).bold()
             HStack {
                 Text("Select Alignment: ")
+//                Spacer()
                 Picker("Baseline Alignment", selection: $selectedBaselineAlignment) {
                     ForEach(selectableBaselineAlignments, id: \.self) { alignment in
                         Text(alignment.title)
                     }
                 }
-            }
+            }/*.border(.black)*/
             .pickerStyle(.menu)
             VStack(alignment: .leading, spacing: 8){
                 CommonBaselineAlignmentView(alignment: selectedBaselineAlignment.alignment)
